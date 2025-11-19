@@ -306,49 +306,177 @@ After:  2025-01-15T143022_survey_data_wave_1_final_v3.csv
 
 ## 🧪 Testing Your Setup
 
-Run these commands to verify everything works:
+Run these commands to verify everything works. First, make sure you have:
+1. Activated your Python virtual environment: `source .venv/bin/activate`
+2. Edited `tooling/config.yaml` with your actual paths
 
-### 1. Test project initialization
+### Complete Test Workflow
 
 ```bash
+# ============================================================================
+# Test 1: Project Initialization
+# ============================================================================
 python tooling/ingest.py init-project --name test-project
-ls -la ~/Projects/test-project  # Should show directory structure
-```
 
-### 2. Test file ingestion
+# Verify structure was created
+ls -la ~/Projects/test-project
+# Should show: data/raw, data/clean, catalog, R, *.Rproj, README.md
 
-```bash
-# Create a dummy CSV
-echo "a,b,c\n1,2,3" > /tmp/test_data.csv
+# ============================================================================
+# Test 2: File Ingestion with Manual Add
+# ============================================================================
+# Create two dummy CSV files
+echo -e "name,age,city\nAlice,30,NYC\nBob,25,LA" > /tmp/test_data_1.csv
+echo -e "id,value\n1,100\n2,200" > /tmp/test_data_2.csv
 
-# Ingest it
-python tooling/ingest.py add /tmp/test_data.csv --project test-project --subdir data/raw
+# Ingest first file
+python tooling/ingest.py add /tmp/test_data_1.csv --project test-project --subdir data/raw
 
-# Check manifest
+# Expected output:
+#   Stabilizing: test_data_1.csv [OK]
+#   Computing SHA256... <hash>...
+#   Moving to: test-project/data/raw/2025-XX-XXTXXXXXX_test_data_1.csv
+#   ✅ Ingested successfully
+
+# Verify the file was moved and renamed
+ls -la ~/Projects/test-project/data/raw/
+# Should show a timestamped file: 2025-XX-XXTXXXXXX_test_data_1.csv
+
+# Check manifest was created and populated
 cat ~/Projects/test-project/catalog/manifest.csv
-```
+# Should show header + 1 data row with sha256, timestamp, etc.
 
-### 3. Test duplicate detection
+# ============================================================================
+# Test 3: Duplicate Detection
+# ============================================================================
+# Create an identical copy of the first file
+echo -e "name,age,city\nAlice,30,NYC\nBob,25,LA" > /tmp/test_data_1_copy.csv
 
-```bash
-# Try ingesting the same file again
-python tooling/ingest.py add /tmp/test_data.csv --project test-project --subdir data/raw
+# Try to ingest it
+python tooling/ingest.py add /tmp/test_data_1_copy.csv --project test-project --subdir data/raw
 
-# Should see: "Duplicate file skipped (SHA256 already exists)"
-```
+# Expected output:
+#   Stabilizing: test_data_1_copy.csv [OK]
+#   Computing SHA256... <same hash>...
+#   ⚠️  Duplicate detected (SHA256 match)
+#   Existing: ~/Projects/test-project/data/raw/2025-XX-XXTXXXXXX_test_data_1.csv
+#   Skipping ingest, recording alias in manifest
 
-### 4. Test pre-commit hook
+# Check manifest - should have 2 rows now (original + duplicate)
+cat ~/Projects/test-project/catalog/manifest.csv | tail -2
 
-```bash
-# Try to commit a CSV (should fail)
-touch test.csv
-git add test.csv
-git commit -m "test"  # Should block with red error message
+# The duplicate row should have action=duplicate_skipped
+
+# ============================================================================
+# Test 4: Routing with Patterns
+# ============================================================================
+# Create files matching different patterns from config.yaml
+echo -e "survey,response\n1,5\n2,3" > /tmp/surveyA_wave1.csv
+echo -e "acs_year,value\n2020,100" > /tmp/acs_2020.csv
+
+# First, create the projects that routing expects (from config.yaml)
+python tooling/ingest.py init-project --name moral-learning
+python tooling/ingest.py init-project --name census-inequality
+
+# Test routing
+python tooling/ingest.py route /tmp/surveyA_wave1.csv /tmp/acs_2020.csv
+
+# Expected output:
+#   File: surveyA_wave1.csv
+#   Routed to: moral-learning/data/raw
+#   ...
+#   File: acs_2020.csv
+#   Routed to: census-inequality/data/raw
+#   ...
+#   Summary: 2 ingested, 0 duplicates, 0 not routed
+
+# Verify files were routed to correct projects
+ls ~/Projects/moral-learning/data/raw/
+ls ~/Projects/census-inequality/data/raw/
+
+# ============================================================================
+# Test 5: Status Command
+# ============================================================================
+# View manifest for test-project
+python tooling/ingest.py status --project test-project --limit 10
+
+# Expected output: table showing recent ingestions with columns:
+#   ts, stage, original_name, action, size_bytes, sha256
+
+# ============================================================================
+# Test 6: Collision Handling (Same Timestamp)
+# ============================================================================
+# Rapidly ingest multiple different files
+# (They may get the same timestamp and trigger collision handling)
+echo "a" > /tmp/file_a.txt
+echo "b" > /tmp/file_b.txt
+echo "c" > /tmp/file_c.txt
+
+python tooling/ingest.py add /tmp/file_a.txt /tmp/file_b.txt /tmp/file_c.txt \
+  --project test-project --subdir data/raw
+
+# Check for collision suffixes (-a, -b, etc.) if timestamps match
+ls ~/Projects/test-project/data/raw/
+
+# ============================================================================
+# Test 7: Pre-commit Hook (Data Protection)
+# ============================================================================
+# Make sure you're in the research-pipeline repo directory
+cd ~/research-pipeline  # or wherever you cloned it
+
+# Try to commit a data file (should fail)
+touch test_block_me.csv
+git add test_block_me.csv
+git commit -m "test"
+
+# Expected output:
+#   ⛔ COMMIT BLOCKED: Data files detected
+#   The following files are blocked:
+#     ❌ test_block_me.csv
 
 # Clean up
-git reset HEAD test.csv
-rm test.csv
+git reset HEAD test_block_me.csv
+rm test_block_me.csv
+
+# ============================================================================
+# Test 8: Cleanup (Optional)
+# ============================================================================
+# Remove test projects if desired
+# rm -rf ~/Projects/test-project
+# rm -rf ~/Projects/moral-learning
+# rm -rf ~/Projects/census-inequality
 ```
+
+### Acceptance Criteria
+
+After running the above tests, you should verify:
+
+- ✅ **Project structure**: Directories `data/raw`, `data/clean`, `catalog/`, `R/` exist
+- ✅ **File renaming**: Files have timestamped names (`YYYY-MM-DDTHHMMSS_slug.ext`)
+- ✅ **Manifest creation**: `catalog/manifest.csv` exists with proper header
+- ✅ **Manifest population**: Each ingestion adds a row with stage, sha256, timestamp, etc.
+- ✅ **Deduplication**: Identical files are detected by SHA256 and skipped
+- ✅ **Duplicate tracking**: Duplicate entries have `action=duplicate_skipped`
+- ✅ **Routing**: Files are correctly routed based on regex patterns in config
+- ✅ **Status display**: `status` command shows recent manifest entries
+- ✅ **Pre-commit protection**: Attempting to commit `.csv` or other data files is blocked
+
+### Troubleshooting
+
+**Error: "REPLACE_ME in config.yaml"**
+- Edit `tooling/config.yaml` and set your actual paths for `downloads_dir` and `projects_base`
+
+**Error: "pyyaml not installed"**
+- Activate venv: `source .venv/bin/activate`
+- Install dependencies: `pip install pyyaml pandas python-dateutil`
+
+**Error: "Project already exists"**
+- Either use a different project name or remove the existing directory
+
+**Pre-commit hook not blocking**
+- Verify hook is installed: `git config core.hooksPath`
+- Should show: `tooling/hooks`
+- If not, run: `git config core.hooksPath tooling/hooks`
 
 ---
 
@@ -359,7 +487,7 @@ research-pipeline/
 ├─ README.md                              # This file
 ├─ .gitignore                             # Data protection rules
 ├─ tooling/
-│   ├─ ingest.py                          # Python CLI (to be implemented)
+│   ├─ ingest.py                          # Python CLI ✅ IMPLEMENTED
 │   ├─ config.yaml                        # User configuration
 │   ├─ hooks/
 │   │   └─ pre-commit                     # Git hook to block data commits
@@ -371,9 +499,9 @@ research-pipeline/
 │           │   └─ clean/.gitkeep
 │           ├─ catalog/.gitkeep
 │           └─ R/
-│               └─ .gitkeep               # R helper functions (to be implemented)
+│               └─ .gitkeep               # R helper functions (Step 3)
 ├─ R/
-│   └─ examples.md                        # R usage examples (to be written)
+│   └─ examples.md                        # R usage examples (Step 3)
 └─ examples/
     └─ _project_template/                 # Example project structure
 ```
@@ -418,17 +546,25 @@ Yes, with `git commit --no-verify`, but **you shouldn't**. If you need to commit
 
 ---
 
-## 🛠️ Next Steps
+## 🛠️ Implementation Status
 
-**Step 2** will implement:
-- Python CLI (`ingest.py`) with subcommands: `route`, `add`, `status`, `init-project`
-- File stabilization, SHA256 hashing, deduplication logic
+**✅ Step 1 - Core Tooling Repo** (Complete)
+- Repository structure and `.gitignore`
+- Pre-commit hook for data protection
+- Configuration templates
+- Project scaffolding templates
+
+**✅ Step 2 - Python Ingestion CLI** (Complete)
+- `ingest.py` with subcommands: `route`, `add`, `status`, `init-project`
+- File stabilization and SHA256 hashing
+- Deduplication logic
 - Manifest creation and updates
+- Comprehensive test workflow in README
 
-**Step 3** will implement:
-- R helper functions (`data_helpers.R`)
+**🔜 Step 3 - R Helper Functions** (Upcoming)
+- `R/data_helpers.R` implementation
 - `{pointblank}` validation suite template
-- R usage examples
+- R usage examples and documentation
 
 ---
 
