@@ -6,7 +6,7 @@ This repository contains **tooling and templates only**—no research data is st
 
 ---
 
-## 🎯 Features
+## Features
 
 - **Automated file ingestion** from Downloads with regex-based routing
 - **SHA256 deduplication** to avoid redundant storage
