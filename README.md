@@ -8,30 +8,30 @@ This repository contains **tooling and templates only**—no research data is st
 
 ## Features
 
-- **Automated file ingestion** from Downloads with regex-based routing
-- **SHA256 deduplication** to avoid redundant storage
-- **Timestamped, normalized filenames** (`YYYY-MM-DDTHHMMS_slug.ext`)
-- **Provenance tracking** via per-project manifest files
-- **RStudio project scaffolding** with `renv` for reproducibility
-- **Pre-commit hooks** that block accidental data commits
-- **R helper functions** using `{here}` for path management
-- **Data validation** with `{pointblank}` (optional)
+- Automated file ingestion from Downloads with regex-based routing
+- SHA256 deduplication to avoid redundant storage
+- Timestamped, normalized filenames (`YYYY-MM-DDTHHMMS_slug.ext`)
+- Provenance tracking via per-project manifest files
+- RStudio project scaffolding with `renv` for reproducibility
+- Pre-commit hooks that block accidental data commits
+- R helper functions using `{here}` for path management
+- Data validation with `{pointblank}` (optional)
 
 ---
 
-## 🔒 Privacy & Security
+## Privacy & Security
 
 ### What's in this repo?
-- ✅ Python CLI tools
-- ✅ Configuration templates
-- ✅ R helper functions
-- ✅ Project scaffolding templates
-- ✅ Documentation
+- Python CLI tools
+- Configuration templates
+- R helper functions
+- Project scaffolding templates
+- Documentation
 
 ### What's NOT in this repo?
-- ❌ Research data files (`.csv`, `.xlsx`, `.sav`, `.dta`, etc.)
-- ❌ Manifest files
-- ❌ Any files in `data/` directories
+- Research data files (`.csv`, `.xlsx`, `.sav`, `.dta`, etc.)
+- Manifest files
+- Any files in `data/` directories
 
 ### Protection mechanisms
 
@@ -41,16 +41,16 @@ This repository contains **tooling and templates only**—no research data is st
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 
-- **Python 3.10+**
-- **R 4.0+** and RStudio (recommended)
-- **Git**
-- **macOS** (Linux/Windows notes included as comments)
+- Python 3.10+
+- R 4.0+ and RStudio (recommended)
+- Git
+- macOS (Linux/Windows notes included as comments)
 
 ---
 
-## 🚀 Setup
+## Setup
 
 ### 1. Clone this repository
 
@@ -115,7 +115,7 @@ install.packages(c("here", "readr", "fs", "pointblank", "renv"))
 
 ---
 
-## 📚 Usage
+## Usage
 
 ### Creating a new project
 
@@ -234,7 +234,7 @@ validate_clean(df_clean, suite = "default")
 
 ---
 
-## 📊 Manifest Structure
+## Manifest Structure
 
 Each project has a `catalog/manifest.csv` that tracks all data files:
 
@@ -265,7 +265,7 @@ moral-learning,clean,/Users/me/Projects/moral-learning/data/clean/2025-01-15T150
 
 ---
 
-## 🔧 Configuration Reference
+## Configuration Reference
 
 ### Routing patterns (`tooling/config.yaml`)
 
@@ -312,7 +312,7 @@ After:  2025-01-15T143022_survey_data_wave_1_final_v3.csv
 
 ---
 
-## 🧪 Testing Your Setup
+## Testing Your Setup
 
 Run these commands to verify everything works. First, make sure you have:
 1. Activated your Python virtual environment: `source .venv/bin/activate`
@@ -459,15 +459,15 @@ rm test_block_me.csv
 
 After running the above tests, you should verify:
 
-- ✅ **Project structure**: Directories `data/raw`, `data/clean`, `catalog/`, `R/` exist
-- ✅ **File renaming**: Files have timestamped names (`YYYY-MM-DDTHHMMSS_slug.ext`)
-- ✅ **Manifest creation**: `catalog/manifest.csv` exists with proper header
-- ✅ **Manifest population**: Each ingestion adds a row with stage, sha256, timestamp, etc.
-- ✅ **Deduplication**: Identical files are detected by SHA256 and skipped
-- ✅ **Duplicate tracking**: Duplicate entries have `action=duplicate_skipped`
-- ✅ **Routing**: Files are correctly routed based on regex patterns in config
-- ✅ **Status display**: `status` command shows recent manifest entries
-- ✅ **Pre-commit protection**: Attempting to commit `.csv` or other data files is blocked
+- **Project structure**: Directories `data/raw`, `data/clean`, `catalog/`, `R/` exist
+- **File renaming**: Files have timestamped names (`YYYY-MM-DDTHHMMSS_slug.ext`)
+- **Manifest creation**: `catalog/manifest.csv` exists with proper header
+- **Manifest population**: Each ingestion adds a row with stage, sha256, timestamp, etc.
+- **Deduplication**: Identical files are detected by SHA256 and skipped
+- **Duplicate tracking**: Duplicate entries have `action=duplicate_skipped`
+- **Routing**: Files are correctly routed based on regex patterns in config
+- **Status display**: `status` command shows recent manifest entries
+- **Pre-commit protection**: Attempting to commit `.csv` or other data files is blocked
 
 ### Troubleshooting
 
@@ -488,7 +488,7 @@ After running the above tests, you should verify:
 
 ---
 
-## 🗂️ Repository Structure
+## Repository Structure
 
 ```
 research-pipeline/
@@ -516,7 +516,7 @@ research-pipeline/
 
 ---
 
-## ❓ FAQ
+## FAQ
 
 ### Why isn't this a Python package?
 
@@ -554,22 +554,22 @@ Yes, with `git commit --no-verify`, but **you shouldn't**. If you need to commit
 
 ---
 
-## 🛠️ Implementation Status
+## Implementation Status
 
-**✅ Step 1 - Core Tooling Repo** (Complete)
+**Step 1 - Core Tooling Repo** (Complete)
 - Repository structure and `.gitignore`
 - Pre-commit hook for data protection
 - Configuration templates
 - Project scaffolding templates
 
-**✅ Step 2 - Python Ingestion CLI** (Complete)
+**Step 2 - Python Ingestion CLI** (Complete)
 - `ingest.py` with subcommands: `route`, `add`, `status`, `init-project`
 - File stabilization and SHA256 hashing
 - Deduplication logic
 - Manifest creation and updates
 - Comprehensive test workflow in README
 
-**✅ Step 3 - R Helper Functions** (Complete)
+**Step 3 - R Helper Functions** (Complete)
 - `R/data_helpers.R` with full implementation
 - `{pointblank}` validation suite template
 - R usage examples and documentation (`R/examples.md`)
@@ -577,13 +577,13 @@ Yes, with `git commit --no-verify`, but **you shouldn't**. If you need to commit
 
 ---
 
-## 📝 License
+## License
 
 MIT (or your preferred license)
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is a personal tooling repo. If you'd like to adapt it for your own use:
 
@@ -595,14 +595,10 @@ If you find bugs or have suggestions, open an issue!
 
 ---
 
-## 🔗 Resources
+## Resources
 
 - [Python `argparse` docs](https://docs.python.org/3/library/argparse.html)
 - [R `{here}` package](https://here.r-lib.org/)
 - [R `{renv}` package](https://rstudio.github.io/renv/)
 - [R `{pointblank}` package](https://rich-iannone.github.io/pointblank/)
 - [Git hooks documentation](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
-
----
-
-**Built with privacy and reproducibility in mind** 🔒📊
