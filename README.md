@@ -2,9 +2,8 @@
 
 **Privacy-first data management tooling for research projects**
 
-This repository contains **tooling and templates only**—no research data is stored here. All actual data files remain in local project directories outside this repo, protecting privacy and keeping the public codebase clean.
+This repository contains **tooling and templates** for automated data storage and management. 
 
----
 
 ## Features
 
@@ -17,7 +16,6 @@ This repository contains **tooling and templates only**—no research data is st
 - R helper functions using `{here}` for path management
 - Data validation with `{pointblank}` (optional)
 
----
 
 ## Privacy & Security
 
@@ -28,18 +26,12 @@ This repository contains **tooling and templates only**—no research data is st
 - Project scaffolding templates
 - Documentation
 
-### What's NOT in this repo?
-- Research data files (`.csv`, `.xlsx`, `.sav`, `.dta`, etc.)
-- Manifest files
-- Any files in `data/` directories
-
 ### Protection mechanisms
 
 1. **`.gitignore`**: Blocks all data file extensions and `data/` directories
 2. **Pre-commit hook**: Actively prevents data files from being staged
 3. **Template structure**: Projects live outside this repo in `projects_base`
 
----
 
 ## Prerequisites
 
@@ -48,7 +40,6 @@ This repository contains **tooling and templates only**—no research data is st
 - Git
 - macOS (Linux/Windows notes included as comments)
 
----
 
 ## Setup
 
@@ -112,8 +103,6 @@ These are only needed when you start working with data in R:
 ```r
 install.packages(c("here", "readr", "fs", "pointblank", "renv"))
 ```
-
----
 
 ## Usage
 
