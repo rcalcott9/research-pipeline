@@ -8,11 +8,11 @@
 # Directory Paths (REQUIRED - edit these!)
 # ----------------------------------------------------------------------------
 # Where the pipeline looks for new files to ingest
-downloads_dir: "/Users/REPLACE_ME/Downloads"
+downloads_dir: "/Users/calypsocalcott/Downloads"
 
 # Base directory where all research projects live
 # Each project will be a subdirectory under this path
-projects_base: "/Users/REPLACE_ME/Projects"
+projects_base: "/Users/calypsocalcott/Projects"
 
 # ----------------------------------------------------------------------------
 # File Routing Rules
@@ -31,29 +31,24 @@ projects_base: "/Users/REPLACE_ME/Projects"
 #   .*                            → catch-all (matches everything)
 
 routing:
-  # Census data example
-  - pattern: "^acs_.*\\.(csv|zip)$"
-    project: "census-inequality"
-    subdir: "data/raw"
+  # MoreBench project files
+  - pattern: "^morebench.*\\.(csv|xlsx)$"
+    project: "Data-Storage"
+    subdir: "MoreBench"
 
-  # Study-specific data example
-  - pattern: "^(studyA|surveyA)_.*\\.(csv|sav|xlsx|dta|parquet)$"
-    project: "moral-learning"
-    subdir: "data/raw"
+  # Moral Learning project files (SML prefix)
+  - pattern: ".*sml.*\\.(csv|xlsx|sav|dta|rds|rda)$"
+    project: "Data-Storage"
+    subdir: "Moral_Learning"
 
-  # Psychology experiment data
-  - pattern: "^(exp|experiment)[_-].*\\.(csv|txt)$"
-    project: "experimental-psych"
-    subdir: "data/raw"
+  # Reflective Equilibrium project files (MC or RE prefix)
+  - pattern: ".*(mc|re).*\\.(csv|xlsx|sav|dta|rds|rda)$"
+    project: "Data-Storage"
+    subdir: "Reflective_Equilibrium"
 
-  # Qualtrics exports (often have Survey_* or similar)
-  - pattern: "^survey.*\\.(csv|xlsx)$"
-    project: "survey-data"
-    subdir: "data/raw"
-
-  # Catch-all: anything not matched above goes to misc
-  - pattern: ".*"
-    project: "misc-datasets"
+  # Catch-all: all other data files go to Data-Storage/data folder
+  - pattern: ".*\\.(csv|xlsx|sav|dta|parquet|rds|rda)$"
+    project: "Data-Storage"
     subdir: "data/raw"
 
 # ----------------------------------------------------------------------------

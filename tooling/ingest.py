@@ -143,7 +143,7 @@ def slugify(text: str, max_len: int = 60) -> str:
 
 def generate_timestamped_filename(original_name: str, config: Dict) -> str:
     """
-    Generate timestamped filename: YYYY-MM-DDTHHMMSS_slug.ext
+    Generate timestamped filename: slug_YYYY-MM-DDTHHMMSS.ext
     """
     # Get naming config
     naming = config.get('naming', {})
@@ -166,8 +166,8 @@ def generate_timestamped_filename(original_name: str, config: Dict) -> str:
     if not slug:
         slug = "file"
 
-    # Combine
-    new_name = f"{timestamp}_{slug}{ext}"
+    # Combine - timestamp at END
+    new_name = f"{slug}_{timestamp}{ext}"
 
     return new_name
 

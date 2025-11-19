@@ -193,23 +193,26 @@ python tooling/ingest.py status --project moral-learning --limit 20
 Once files are ingested, open the project in RStudio:
 
 ```r
-# Load helper functions
+library(dplyr)
 source("R/data_helpers.R")
 
-# Load the most recent raw CSV file
-df_raw <- load_raw_latest("survey.*\\.csv$")
+# Load the most recent file from a project subfolder
+df_raw <- load_raw_latest("SML.*\\.csv$", subdir = "Moral_Learning")
+# Or: df_raw <- load_raw_latest("morebench.*\\.csv$", subdir = "MoreBench")
+# Or: df_raw <- load_raw_latest("MC.*\\.csv$", subdir = "Reflective_Equilibrium")
 
 # Clean your data
 df_clean <- df_raw %>%
   filter(!is.na(participant_id)) %>%
   mutate(response_coded = recode_responses(response))
 
-# Save cleaned data with provenance tracking
-clean_path <- save_clean(
+# Save cleaned data back to the same project folder
+save_clean(
   df_clean,
-  base = "survey_clean.csv",
+  base = "SML_criminal_clean.csv",
+  subdir = "Moral_Learning",
   notes = "Removed NAs, recoded responses",
-  derived_sha = "abc123..."  # SHA256 from manifest if available
+  derived_from = ""  # Optionally add SHA256 from manifest
 )
 
 # Validate the cleaned data
@@ -217,12 +220,17 @@ validate_clean(df_clean, suite = "default")
 ```
 
 **Helper functions** (in `R/data_helpers.R`):
-- `raw_dir()` → path to `data/raw/` using `{here}`
+- `data_dir(subdir)` → path to any subdirectory using `{here}`
+- `raw_dir(subdir)` → path to data directory (default: `data/raw`)
 - `clean_dir()` → path to `data/clean/`
 - `manifest_path()` → path to `catalog/manifest.csv`
-- `load_raw_latest(pattern)` → reads newest matching file
-- `save_clean(df, base, notes, derived_sha)` → saves with timestamp, updates manifest
+- `load_raw_latest(pattern, subdir)` → reads newest matching file from subfolder
+- `save_clean(df, base, subdir, notes, derived_from)` → saves with timestamp, updates manifest
 - `validate_clean(df, suite)` → runs `{pointblank}` validation suite
+- `list_files(subdir, pattern)` → list all files in a subfolder
+- `read_manifest()` → read the full provenance manifest
+
+**See full examples:** `R/examples.md`
 
 ---
 
@@ -561,10 +569,11 @@ Yes, with `git commit --no-verify`, but **you shouldn't**. If you need to commit
 - Manifest creation and updates
 - Comprehensive test workflow in README
 
-**🔜 Step 3 - R Helper Functions** (Upcoming)
-- `R/data_helpers.R` implementation
+**✅ Step 3 - R Helper Functions** (Complete)
+- `R/data_helpers.R` with full implementation
 - `{pointblank}` validation suite template
-- R usage examples and documentation
+- R usage examples and documentation (`R/examples.md`)
+- Support for flexible project folder structure
 
 ---
 
