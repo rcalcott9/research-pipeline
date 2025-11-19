@@ -1,0 +1,102 @@
+# ============================================================================
+# Research Data Pipeline Configuration
+# ============================================================================
+# This file controls how files are ingested, routed, and named.
+# Edit the paths below to match your local system.
+
+# ----------------------------------------------------------------------------
+# Directory Paths (REQUIRED - edit these!)
+# ----------------------------------------------------------------------------
+# Where the pipeline looks for new files to ingest
+downloads_dir: "/Users/REPLACE_ME/Downloads"
+
+# Base directory where all research projects live
+# Each project will be a subdirectory under this path
+projects_base: "/Users/REPLACE_ME/Projects"
+
+# ----------------------------------------------------------------------------
+# File Routing Rules
+# ----------------------------------------------------------------------------
+# Files are matched against these patterns (regex) in order.
+# First match wins. Case-insensitive matching.
+#
+# Fields:
+#   pattern: regex applied to the original filename (basename only)
+#   project: destination project name (subdirectory under projects_base)
+#   subdir: destination subdirectory within the project (typically data/raw)
+#
+# Example patterns:
+#   ^acs_.*\.(csv|zip)$           → files starting with "acs_" ending in .csv or .zip
+#   ^(studyA|surveyA)_.*\.csv$    → files starting with "studyA" or "surveyA"
+#   .*                            → catch-all (matches everything)
+
+routing:
+  # Census data example
+  - pattern: "^acs_.*\\.(csv|zip)$"
+    project: "census-inequality"
+    subdir: "data/raw"
+
+  # Study-specific data example
+  - pattern: "^(studyA|surveyA)_.*\\.(csv|sav|xlsx|dta|parquet)$"
+    project: "moral-learning"
+    subdir: "data/raw"
+
+  # Psychology experiment data
+  - pattern: "^(exp|experiment)[_-].*\\.(csv|txt)$"
+    project: "experimental-psych"
+    subdir: "data/raw"
+
+  # Qualtrics exports (often have Survey_* or similar)
+  - pattern: "^survey.*\\.(csv|xlsx)$"
+    project: "survey-data"
+    subdir: "data/raw"
+
+  # Catch-all: anything not matched above goes to misc
+  - pattern: ".*"
+    project: "misc-datasets"
+    subdir: "data/raw"
+
+# ----------------------------------------------------------------------------
+# File Naming Convention
+# ----------------------------------------------------------------------------
+naming:
+  # Timestamp format for renamed files (Python strftime syntax)
+  # Default: ISO 8601-like format without colons (filesystem-safe)
+  timestamp_format: "%Y-%m-%dT%H%M%S"
+
+  # Maximum length for the slug portion of the filename
+  # Longer basenames will be truncated
+  slug_maxlen: 60
+
+  # Convert file extension to lowercase?
+  lower_ext: true
+
+  # Preserve original basename in the slug?
+  # If false, you'd need to add custom slug logic
+  preserve_basename: true
+
+# ----------------------------------------------------------------------------
+# Advanced Options (optional)
+# ----------------------------------------------------------------------------
+# Uncomment and customize as needed:
+
+# deduplication:
+#   # Method for detecting duplicates (sha256, md5, or none)
+#   method: "sha256"
+#
+#   # What to do when a duplicate is found (skip, rename, or error)
+#   on_duplicate: "skip"
+
+# stabilization:
+#   # How long to wait for file size to stabilize (seconds)
+#   # Useful for large downloads or files being written by another process
+#   poll_interval: 0.5
+#   stable_count: 3
+#   timeout: 30
+
+# logging:
+#   # Log level (DEBUG, INFO, WARNING, ERROR)
+#   level: "INFO"
+#
+#   # Log file path (optional; if not set, logs to console only)
+#   # file: "/Users/REPLACE_ME/Projects/pipeline.log"

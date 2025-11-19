@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# ============================================================================
+# Pre-commit Hook: Data Privacy Guard
+# ============================================================================
+# This hook prevents accidental commits of research data files.
+#
+# Installation:
+#   git config core.hooksPath tooling/hooks
+#
+# What it blocks:
+#   - Any file under a data/ directory at any level
+#   - Files with data-related extensions (.csv, .xlsx, .sav, .dta, etc.)
+#   - Manifest files (manifest.csv)
+#
+# Override (emergency only):
+#   git commit --no-verify
+#   (You should almost never do this!)
+# ============================================================================
+
+set -euo pipefail
+
+# Color output for terminal
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Data file extensions to block
+DATA_EXTENSIONS=(
+    "csv" "tsv"
+    "xlsx" "xls"
+    "sav" "dta"
+    "parquet" "feather"
+    "rds" "rda" "RData"
+    "json" "ndjson"
+    "sqlite" "db"
+    "h5" "hdf5" "zarr"
+)
+
+# Build regex pattern for extensions
+EXT_PATTERN=$(IFS='|'; echo "${DATA_EXTENSIONS[*]}")
+
+# Check for staged files
+BLOCKED_FILES=()
+
+# Get all staged files
+while IFS= read -r file; do
+    # Skip empty lines
+    [[ -z "$file" ]] && continue
+
+    # Block files in any data/ directory
+    if [[ "$file" =~ (^|/)data/ ]]; then
+        BLOCKED_FILES+=("$file")
+        continue
+    fi
+
+    # Block manifest files
+    if [[ "$file" =~ manifest\.csv$ ]]; then
+        BLOCKED_FILES+=("$file")
+        continue
+    fi
+
+    # Block files with data extensions
+    if [[ "$file" =~ \.($EXT_PATTERN)$ ]]; then
+        BLOCKED_FILES+=("$file")
+        continue
+    fi
+
+done < <(git diff --cached --name-only --diff-filter=ACM)
+
+# If any files were blocked, abort the commit
+if [[ ${#BLOCKED_FILES[@]} -gt 0 ]]; then
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${RED}⛔ COMMIT BLOCKED: Data files detected${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${YELLOW}This repository should contain ONLY code and tooling.${NC}"
+    echo -e "${YELLOW}Research data must stay in project directories outside this repo.${NC}"
+    echo ""
+    echo "The following files are blocked:"
+    echo ""
+    for file in "${BLOCKED_FILES[@]}"; do
+        echo "  ❌ $file"
+    done
+    echo ""
+    echo "To fix this:"
+    echo "  1. Unstage the data files:"
+    echo "     git reset HEAD ${BLOCKED_FILES[0]}"
+    echo ""
+    echo "  2. Ensure these files are properly ignored in .gitignore"
+    echo ""
+    echo "  3. Move data files to your projects directory (outside this repo)"
+    echo ""
+    echo -e "${YELLOW}⚠️  To override (NOT recommended):${NC}"
+    echo "     git commit --no-verify"
+    echo ""
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    exit 1
+fi
+
+# All clear!
+exit 0

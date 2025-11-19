@@ -1,0 +1,211 @@
+# ============================================================================
+# PRIVACY-FIRST DATA PROTECTION
+# ============================================================================
+# This repo contains ONLY tooling and templates.
+# All actual research data must stay in project directories outside this repo.
+
+# Block any data/ directories at any depth
+**/data/
+data/
+
+# Exception: keep .gitkeep files for template structure
+!**/.gitkeep
+
+# Block common data file extensions anywhere in the repo
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.sav
+*.dta
+*.parquet
+*.feather
+*.rds
+*.rda
+*.RData
+*.json
+*.ndjson
+*.sqlite
+*.db
+*.h5
+*.hdf5
+*.zarr
+
+# Block manifest files (these live in project dirs, not this repo)
+**/manifest.csv
+catalog/
+
+# ============================================================================
+# PYTHON
+# ============================================================================
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# ============================================================================
+# R
+# ============================================================================
+# History files
+.Rhistory
+.Rapp.history
+
+# Session Data files
+.RData
+
+# User-specific files
+.Ruserdata
+
+# RStudio files
+.Rproj.user/
+
+# OAuth2 token
+.httr-oauth
+
+# knitr and R markdown default cache directories
+*_cache/
+/cache/
+
+# Temporary files created by R markdown
+*.utf8.md
+*.knit.md
+
+# R Environment Variables
+.Renviron
+
+# renv library (each project has its own, not tracked)
+renv/library/
+renv/local/
+renv/staging/
+
+# Keep renv.lock files for reproducibility
+!renv.lock
+
+# pkgdown site
+docs/
+/docs/
+
+# ============================================================================
+# OPERATING SYSTEM
+# ============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================================================
+# EDITORS & IDEs
+# ============================================================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains
+.idea/
+*.iml
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+Session.vim
+
+# ============================================================================
+# PROJECT-SPECIFIC
+# ============================================================================
+# Logs
+*.log
+
+# Temporary test directories
+/tmp/
+*.tmp
+
+# Local configuration overrides (if you add this feature)
+config.local.yaml
