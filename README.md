@@ -2,7 +2,7 @@
 
 **Privacy-first data management tooling for research projects**
 
-This repository contains a tool I've built to manage and store data. Feel free to fork or to use it as inspo. 
+This repository contains a tool I've built to manage and store data. Feel free to clone or to use it as inspo. 
 
 
 ## Features
